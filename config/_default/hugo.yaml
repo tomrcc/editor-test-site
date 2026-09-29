@@ -1,0 +1,29 @@
+# Developer-only config. Editors edit params.yaml through the Site settings collection.
+baseURL: "https://example.com/"
+title: Editor Test Site
+locale: en-US
+buildDrafts: false
+buildFuture: false
+timeZone: Etc/UTC
+
+taxonomies:
+  tag: tags
+
+outputs:
+  home: [HTML, RSS, JSON]
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+
+module:
+  imports:
+    - path: github.com/adityatelange/hugo-PaperMod
+    - path: github.com/CloudCannon/editable-regions
+
+params:
+  editable_regions:
+    # T-ICON: lets the editor's renderer readFile the icons (resources.Get finds nothing there)
+    additional_dirs:
+      assets/icons: [".svg"]

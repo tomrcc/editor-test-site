@@ -1,0 +1,5 @@
+{
+  "name": "editor-test-site",
+  "private": true,
+  "description": "Exists only so CloudCannon resolves Node from .nvmrc (test T-NVMRC). No dependencies."
+}

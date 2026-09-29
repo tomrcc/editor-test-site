@@ -1,0 +1,348 @@
+# Test harness config. Each block is tagged with the test in TESTING.md it exists for.
+
+timezone: Etc/UTC
+
+data_config:
+  params: # T-PARAMS: lets @data[params] regions bind the config file
+    path: config/_default/params.yaml
+  tags: # T-TAXONOMY
+    path: data/tags.yaml
+  colors: # T-SELECT-CONVENTION
+    path: data/colors.yaml
+
+collections_config:
+  pages:
+    path: content
+    glob:
+      - "*.md"
+    url: /[full_slug]/
+    name: Pages
+    icon: description
+    disable_add_folder: true
+    create:
+      path: "[relative_base_path]/{title|slugify}.[ext]"
+    schemas:
+      default:
+        path: .cloudcannon/schemas/page.md
+        name: Page
+      home:
+        path: .cloudcannon/schemas/home.md
+        name: Home
+    add_options:
+      - name: Page
+        schema: default
+    _inputs:
+      "menu.main.weight": # T-NESTED-INPUTS: does a dotted key match menu.main.weight?
+        type: number
+        label: Menu order (DOTTED _inputs key)
+      weight: # T-NESTED-INPUTS: or does the plain key match it?
+        type: number
+        label: Menu order (PLAIN _inputs key)
+
+  posts:
+    path: content/posts
+    glob:
+      - "**/index.md"
+      - "_index.md"
+    url: /posts/[full_slug]/
+    name: Posts
+    icon: article
+    disable_add_folder: true
+    create: # T-CREATE: new posts should be bundles
+      path: "[relative_base_path]/{title|slugify}/index.[ext]"
+    schemas:
+      default:
+        path: .cloudcannon/schemas/post.md
+        name: Post
+      list:
+        path: .cloudcannon/schemas/page.md
+        name: List page
+    add_options:
+      - name: Post
+        schema: default
+    _inputs:
+      date: # T-CREATE: the NOW value's format decides whether T-DATES breaks the editor
+        type: datetime
+        instance_value: NOW
+      image: # T-UPLOAD: cover.image uploads into the post's bundle
+        type: image
+        label: Cover image
+        options:
+          paths:
+            uploads: content/posts/[relative_base_path]
+            static: ""
+            uploads_use_relative_path: true
+
+  settings: # T-DEVFILES and T-PARAMS: with include_developer_files
+    path: config/_default
+    glob:
+      - params.yaml
+    name: Site settings
+    icon: settings
+    include_developer_files: true
+    _enabled_editors:
+      - data
+    disable_url: true
+    disable_add: true
+    disable_add_folder: true
+    disable_file_actions: true
+
+  settings_no_devfiles: # T-DEVFILES: same, without include_developer_files. Expected empty when hosted
+    path: config/_default
+    glob:
+      - params.yaml
+    name: Site settings (no include_developer_files)
+    icon: settings_alert
+    _enabled_editors:
+      - data
+    disable_url: true
+    disable_add: true
+    disable_add_folder: true
+    disable_file_actions: true
+
+  site_data: # T-TAXONOMY
+    path: data
+    glob:
+      - tags.yaml
+      - colors.yaml
+    name: Site data
+    icon: dataset
+    _enabled_editors:
+      - data
+    disable_url: true
+    disable_add: true
+    disable_add_folder: true
+    disable_file_actions: true
+
+collection_groups:
+  - heading: Content
+    collections:
+      - pages
+      - posts
+  - heading: Site
+    collections:
+      - settings
+      - settings_no_devfiles
+      - site_data
+
+file_config:
+  - glob: config/_default/params.yaml
+    _inputs:
+      env:
+        hidden: true
+      defaultTheme:
+        hidden: true
+      ShowReadingTime:
+        hidden: true
+      intro_title:
+        type: text
+        label: Intro title (T-PARAMS)
+      intro_text:
+        type: text
+        label: Intro text (T-PARAMS)
+      links: # T-SINGLEKEY
+        type: array
+        label: Links (single-key maps)
+        options:
+          structures: _structures.single_key_links
+  - glob: data/tags.yaml # T-TAXONOMY: root array of strings
+    _inputs:
+      $:
+        type: array
+        label: Tags
+      $[*]:
+        type: text
+        label: Tag
+  - glob: data/colors.yaml
+    _inputs:
+      $:
+        type: array
+        label: Colours
+      $[*]:
+        type: text
+        label: Colour
+
+_inputs:
+  tags: # T-TAXONOMY
+    type: multiselect
+    comment: Manage the list under Site data → Tags.
+    options:
+      values: data.tags
+      allow_create: true
+  my_colors: # T-SELECT-CONVENTION: no values on purpose. Does it pick up the colors data set by name?
+    type: select
+    label: Colour (no values configured)
+  _name:
+    hidden: true
+  faq_question:
+    type: text
+  faq_answer:
+    type: text
+  buttons: # T-ARRAY-WRAPPER
+    type: array
+    options:
+      structures: _structures.buttons
+  content_blocks: # T-BLOCKS
+    type: array
+    options:
+      structures: _structures.content_blocks
+  items:
+    type: array
+    options:
+      structures: _structures.stat_items
+  icon:
+    type: select
+    options:
+      values:
+        - star
+        - arrow
+
+_structures:
+  single_key_links: # T-SINGLEKEY: one value per key name
+    values:
+      - label: GitHub
+        icon: code
+        value:
+          github:
+        _inputs:
+          github:
+            type: url
+      - label: Email
+        icon: mail
+        value:
+          email:
+        _inputs:
+          email:
+            type: email
+  buttons:
+    values:
+      - label: Button
+        icon: ads_click
+        value:
+          label:
+          url:
+          icon: star
+  content_blocks:
+    id_key: _name
+    values:
+      - label: Text block
+        icon: notes
+        value:
+          _name: blocks/text
+          text:
+        _inputs:
+          text:
+            type: markdown
+      - label: Stats block
+        icon: bar_chart
+        value:
+          _name: blocks/stats
+          heading:
+          items: []
+  stat_items:
+    values:
+      - label: Stat
+        icon: numbers
+        value:
+          value:
+          label:
+        _inputs:
+          value:
+            type: text
+
+_snippets_imports:
+  hugo: true
+
+_snippets:
+  badge: # T-SNIPPET-NOARGS
+    template: hugo_paired_shortcode_named_args
+    inline: true
+    preview:
+      text:
+        - key: text
+        - Badge
+      icon: label
+    definitions:
+      shortcode_name: badge
+      content_key: text
+      named_args: []
+    _inputs:
+      text:
+        type: text
+
+  collapse: # T-SNIPPET-BOOL: the theme compares openByDefault with a real boolean
+    template: hugo_paired_shortcode_named_args
+    inline: false
+    preview:
+      text:
+        - key: summary
+        - Collapse
+      icon: unfold_more
+    definitions:
+      shortcode_name: collapse
+      content_key: inner
+      named_args:
+        - editor_key: summary
+          type: string
+        - editor_key: openByDefault
+          type: boolean
+          optional: true
+          remove_empty: true
+    _inputs:
+      openByDefault:
+        type: switch
+      inner:
+        type: markdown
+
+  stats: # T-SNIPPET-REPEATING: parent/child shortcodes
+    snippet: "{{< stats >}}[[stat_items]]{{< /stats >}}"
+    inline: false
+    preview:
+      text: Stats
+      icon: bar_chart
+    params:
+      stat_items:
+        parser: repeating
+        options:
+          snippet: "{{< stat [[stat_args]] >}}[[stat_text]]{{< /stat >}}"
+          editor_key: stats
+          default_length: 1
+          style:
+            output: block
+            between: "\n"
+            block:
+              leading: "\n"
+              trailing: "\n"
+      stat_args:
+        parser: key_values
+        options:
+          models:
+            - editor_key: value
+              type: string
+          format:
+            root_value_delimiter: "="
+            root_pair_delimiter:
+              - " "
+            string_boundary:
+              - '"'
+      stat_text:
+        parser: content
+        options:
+          editor_key: text
+          trim_text: true
+    _inputs:
+      stats:
+        type: array
+        options:
+          structures: _structures.snippet_stats
+      value:
+        type: text
+      text:
+        type: text
+    _structures:
+      snippet_stats:
+        values:
+          - label: Stat
+            value:
+              value:
+              text:

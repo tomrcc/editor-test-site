@@ -1,0 +1,12 @@
+{{- /* Overrides the theme's head hook (theme file: layouts/_partials/extend_head.html). */ -}}
+{{ partial "editable-regions" . }}
+<script>console.log("[T-TIMING] inline head script: inEditorMode =", window.inEditorMode);</script>
+<script defer src="{{ "js/probe.js" | relURL }}"></script>
+<style>
+  .test { border: 2px dashed #999; padding: 1rem; margin: 1.5rem 0; border-radius: 8px; }
+  .test h2 { margin-top: 0; font-size: 1.1rem; }
+  .box { border: 1px solid #ccc; padding: .5rem; }
+  .buttons, .block-stats ul { min-height: 3rem; }
+  .button { display: inline-flex; gap: .4rem; align-items: center; border: 1px solid #888; padding: .3rem .7rem; margin: .2rem; border-radius: 6px; }
+  .block-text, .block-stats { border-left: 4px solid #6a8; padding-left: .8rem; margin: .8rem 0; }
+</style>

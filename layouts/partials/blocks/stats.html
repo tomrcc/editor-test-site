@@ -1,0 +1,10 @@
+<div class="block-stats">
+  <h3 data-editable="text" data-prop="heading">{{ .heading }}</h3>
+  {{- if or .items site.Params.ENV_CLIENT }}
+  <ul data-editable="array" data-prop="items">
+    {{- range .items }}
+    <li data-editable="array-item"><strong data-editable="text" data-prop="value">{{ .value }}</strong> <span data-editable="text" data-prop="label">{{ .label }}</span></li>
+    {{- end }}
+  </ul>
+  {{- end }}
+</div>

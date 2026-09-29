@@ -1,0 +1,7 @@
+public/
+resources/_gen/
+.hugo_build.lock
+.hugo_cache/
+node_modules/
+assets/jsconfig.json
+_vendor/

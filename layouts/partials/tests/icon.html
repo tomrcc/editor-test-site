@@ -1,0 +1,14 @@
+{{- /* resources.Get for the build; readFile of an additional_dirs path for the editor. data-src shows which path ran. */ -}}
+{{- with . }}
+  {{- $path := printf "icons/%s.svg" . }}
+  {{- with resources.Get $path }}
+    <span class="icon" data-src="pipeline">{{ .Content | safeHTML }}</span>
+  {{- else }}
+    {{- $file := printf "assets/%s" $path }}
+    {{- if fileExists $file }}
+      <span class="icon" data-src="readFile">{{ readFile $file | safeHTML }}</span>
+    {{- else }}
+      <span class="icon" data-src="missing">?</span>
+    {{- end }}
+  {{- end }}
+{{- end }}

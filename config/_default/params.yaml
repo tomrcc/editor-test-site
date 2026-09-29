@@ -1,0 +1,9 @@
+env: production
+defaultTheme: auto
+ShowReadingTime: false
+tests:
+  intro_title: Params intro title
+  intro_text: Change these in Site settings, then watch the three T-PARAMS boxes.
+  links:
+    - github: https://github.com/example
+    - email: hello@example.com

@@ -1,0 +1,70 @@
+{{- /* Test harness home page. Each section is one test from TESTING.md. */ -}}
+{{ define "main" }}
+<article class="post-single">
+  <h1 data-editable="text" data-prop="title">{{ .Title }}</h1>
+  <p>Each dashed box is one test. See <code>TESTING.md</code>.</p>
+
+  <section class="test" id="t-params">
+    <h2>T-PARAMS: do settings edits reach the page live?</h2>
+    <p><strong>A. Primitive region</strong> (<code>@data[params].tests.intro_title</code>):
+      <span data-editable="text" data-prop="@data[params].tests.intro_title">{{ site.Params.tests.intro_title }}</span></p>
+    <p><strong>B. Component; the partial reads its context (<code>.</code>)</strong></p>
+    <div data-editable="component" data-component="tests/params-live" data-prop="@data[params].tests">
+      {{- partial "tests/params-live" site.Params.tests -}}
+    </div>
+    <p><strong>C. Component; the partial reads <code>site.Params</code></strong></p>
+    <div data-editable="component" data-component="tests/params-stale" data-prop="@data[params].tests">
+      {{- partial "tests/params-stale" site.Params.tests -}}
+    </div>
+  </section>
+
+  <section class="test" id="t-singlekey">
+    <h2>T-SINGLEKEY: links stored as single-key maps (edit in Site settings)</h2>
+    <ul>
+      {{- range site.Params.tests.links }}{{ range $k, $v := . }}
+      <li>{{ $k }}: {{ $v }}</li>
+      {{- end }}{{ end }}
+    </ul>
+  </section>
+
+  <section class="test" id="t-array-wrapper">
+    <h2>T-ARRAY-WRAPPER and T-ICON: add a button</h2>
+    {{- if isset .Params "buttons" }}
+    <div class="buttons" data-editable="array" data-prop="buttons" data-component="tests/button">
+      {{- range .Params.buttons }}
+      <div data-editable="array-item">{{ partial "tests/button" . }}</div>
+      {{- end }}
+    </div>
+    {{- end }}
+  </section>
+
+  <section class="test" id="t-summary">
+    <h2>T-SUMMARY: text region inside &lt;summary&gt;</h2>
+    <details>
+      <summary data-editable="text" data-prop="faq_question">{{ .Params.faq_question }}</summary>
+      <p data-editable="text" data-prop="faq_answer">{{ .Params.faq_answer }}</p>
+    </details>
+  </section>
+
+  <section class="test" id="t-blocks">
+    <h2>T-BLOCKS: page-builder blocks</h2>
+    {{- if isset .Params "content_blocks" }}
+    <div data-editable="array" data-prop="content_blocks" data-component-key="_name">
+      {{- range .Params.content_blocks }}
+      <div data-editable="array-item" data-id="{{ ._name }}" data-component="{{ ._name }}">{{ partial ._name . }}</div>
+      {{- end }}
+    </div>
+    {{- end }}
+  </section>
+
+  <section class="test" id="t-baseurl">
+    <h2>T-BASEURL: absolute URLs</h2>
+    <p><code>site.BaseURL</code> = <code>{{ site.BaseURL }}</code></p>
+    <p>This page's <code>.Permalink</code> = <code>{{ .Permalink }}</code></p>
+    {{- with site.GetPage "/posts/bundle-post" }}{{ with .Resources.GetMatch "cover*" }}
+    <p><img src="{{ .Permalink }}" alt="Absolute-URL image: broken means it points at baseURL" width="160"></p>
+    <p>Image <code>src</code> = <code>{{ .Permalink }}</code></p>
+    {{- end }}{{ end }}
+  </section>
+</article>
+{{ end }}
