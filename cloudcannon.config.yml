@@ -129,6 +129,38 @@ collections_config:
             static: ""
             uploads_use_relative_path: true
 
+  posts_d: # H6 variant D: no add_options and NO disable_add_folder. Also tests instance_value on other keys
+    path: content/posts-d
+    glob:
+      - "**/index.md"
+    url: /posts-d/[full_slug]/
+    name: Posts D (no disable_add_folder)
+    icon: article
+    create:
+      path: "[relative_base_path]/{title|slugify}/index.[ext]"
+    schemas:
+      default:
+        path: .cloudcannon/schemas/post-d.md
+        name: Post
+    _inputs:
+      date:
+        type: datetime
+        instance_value: NOW
+      published_at: # Same as date under another key: is `date` special?
+        type: datetime
+        instance_value: NOW
+      uid: # Does instance_value work at all in this flow?
+        type: text
+        instance_value: UUID
+      image:
+        type: image
+        label: Cover image
+        options:
+          paths:
+            uploads: content/posts-d/[relative_base_path]
+            static: ""
+            uploads_use_relative_path: true
+
   settings: # T-DEVFILES and T-PARAMS: with include_developer_files
     path: config/_default
     glob:
@@ -192,6 +224,7 @@ collection_groups:
       - posts
       - posts_b
       - posts_c
+      - posts_d
   - heading: Site
     collections:
       - settings
