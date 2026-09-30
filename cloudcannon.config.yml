@@ -75,6 +75,60 @@ collections_config:
             static: ""
             uploads_use_relative_path: true
 
+  posts_b: # H6 variant B: like posts, but NO add_options. Isolates add_options vs create.path
+    path: content/posts-b
+    glob:
+      - "**/index.md"
+    url: /posts-b/[full_slug]/
+    name: Posts B (no add_options)
+    icon: article
+    disable_add_folder: true
+    create:
+      path: "[relative_base_path]/{title|slugify}/index.[ext]"
+    schemas:
+      default:
+        path: .cloudcannon/schemas/post.md
+        name: Post
+    _inputs:
+      date:
+        type: datetime
+        instance_value: NOW
+      image:
+        type: image
+        label: Cover image
+        options:
+          paths:
+            uploads: content/posts-b/[relative_base_path]
+            static: ""
+            uploads_use_relative_path: true
+
+  posts_c: # H6 variant C: no add_options, and the schema has NO date key. Isolates schema date vs instance_value
+    path: content/posts-c
+    glob:
+      - "**/index.md"
+    url: /posts-c/[full_slug]/
+    name: Posts C (no add_options, no date in schema)
+    icon: article
+    disable_add_folder: true
+    create:
+      path: "[relative_base_path]/{title|slugify}/index.[ext]"
+    schemas:
+      default:
+        path: .cloudcannon/schemas/post-no-date.md
+        name: Post
+    _inputs:
+      date:
+        type: datetime
+        instance_value: NOW
+      image:
+        type: image
+        label: Cover image
+        options:
+          paths:
+            uploads: content/posts-c/[relative_base_path]
+            static: ""
+            uploads_use_relative_path: true
+
   settings: # T-DEVFILES and T-PARAMS: with include_developer_files
     path: config/_default
     glob:
@@ -136,6 +190,8 @@ collection_groups:
     collections:
       - pages
       - posts
+      - posts_b
+      - posts_c
   - heading: Site
     collections:
       - settings
