@@ -1,6 +1,6 @@
 module github.com/CloudCannon/editor-test-site
 
-go 1.19
+go 1.27.1
 
 require (
 	github.com/CloudCannon/editable-regions v0.0.21 // indirect
