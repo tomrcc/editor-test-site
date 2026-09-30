@@ -161,6 +161,39 @@ collections_config:
             static: ""
             uploads_use_relative_path: true
 
+  posts_e: # H6 variant E: create and _inputs set on the SCHEMA entry, not the collection
+    path: content/posts-e
+    glob: # Wide on purpose: flat files must show up, so a failed create.path is visible
+      - "**/*.md"
+      - "!_index.md"
+    url: /posts-e/[full_slug]/
+    name: Posts E (create + inputs on schema)
+    icon: article
+    schemas:
+      default:
+        path: .cloudcannon/schemas/post-d.md
+        name: Post
+        create:
+          path: "[relative_base_path]/{title|slugify}/index.[ext]"
+        _inputs:
+          date:
+            type: datetime
+            instance_value: NOW
+          published_at:
+            type: datetime
+            instance_value: NOW
+          uid:
+            type: text
+            instance_value: UUID
+          image:
+            type: image
+            label: Cover image (schema-level input)
+            options:
+              paths:
+                uploads: content/posts-e/[relative_base_path]
+                static: ""
+                uploads_use_relative_path: true
+
   settings: # T-DEVFILES and T-PARAMS: with include_developer_files
     path: config/_default
     glob:
@@ -225,6 +258,7 @@ collection_groups:
       - posts_b
       - posts_c
       - posts_d
+      - posts_e
   - heading: Site
     collections:
       - settings
