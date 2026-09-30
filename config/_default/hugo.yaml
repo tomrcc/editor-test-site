@@ -22,3 +22,4 @@ params:
     # T-ICON: lets the editor's renderer readFile the icons (resources.Get finds nothing there)
     additional_dirs:
       assets/icons: [".svg"]
+      assets/test-images: [".jpg"] # T-RESIZE

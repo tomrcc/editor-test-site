@@ -76,6 +76,21 @@
     </details>
   </section>
 
+  <section class="test" id="t-button">
+    <h2>T-BUTTON: text region inside a &lt;button&gt;</h2>
+    <button type="button" onclick="this.dataset.clicks = (+this.dataset.clicks || 0) + 1; document.getElementById('t-button-clicks').textContent = this.dataset.clicks">
+      <span data-editable="text" data-prop="button_text">{{ .Params.button_text }}</span>
+    </button>
+    <p>Button clicks registered: <span id="t-button-clicks">0</span></p>
+  </section>
+
+  <section class="test" id="t-resize">
+    <h2>T-RESIZE: image processing in a re-rendered component</h2>
+    <div data-editable="component" data-component="tests/resize" data-prop="resize_test">
+      {{- partial "tests/resize" .Params.resize_test -}}
+    </div>
+  </section>
+
   <section class="test" id="t-blocks">
     <h2>T-BLOCKS: page-builder blocks</h2>
     {{- if isset .Params "content_blocks" }}

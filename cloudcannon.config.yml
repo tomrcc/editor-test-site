@@ -227,6 +227,29 @@ collections_config:
             static: ""
             uploads_use_relative_path: true
 
+  posts_g: # H6 variant G: exactly F (working glob) plus disable_add_folder. Does it block create.path's folder?
+    path: content/posts-g
+    glob:
+      - "**/*.md"
+      - "!_index.md"
+    url: /posts-g/[full_slug]/
+    name: Posts G (wide glob + disable_add_folder)
+    icon: article
+    disable_add_folder: true
+    create:
+      path: "[relative_base_path]/{title|slugify}/index.[ext]"
+    schemas:
+      default:
+        path: .cloudcannon/schemas/post-d.md
+        name: Post
+    _inputs:
+      date:
+        type: datetime
+        instance_value: NOW
+      uid:
+        type: text
+        instance_value: UUID
+
   settings: # T-DEVFILES and T-PARAMS: with include_developer_files
     path: config/_default
     glob:
@@ -293,6 +316,7 @@ collection_groups:
       - posts_d
       - posts_e
       - posts_f
+      - posts_g
   - heading: Site
     collections:
       - settings
@@ -360,6 +384,10 @@ _inputs:
   faq_question:
     type: text
   faq_answer:
+    type: text
+  button_text:
+    type: text
+  caption:
     type: text
   buttons: # T-ARRAY-WRAPPER
     type: array

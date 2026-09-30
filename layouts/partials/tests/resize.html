@@ -1,0 +1,11 @@
+{{- /* T-RESIZE: can the editor's Hugo process an image listed in additional_dirs? data-status says what happened. */ -}}
+<div class="box">
+  <p data-editable="text" data-prop="caption">{{ .caption }}</p>
+  {{- with resources.Get "test-images/sample.jpg" }}
+    {{- $small := .Resize "120x" }}
+    <p data-status="resized" data-width="{{ $small.Width }}">Resized: {{ $small.Width }}×{{ $small.Height }} (original {{ .Width }}px), src <code>{{ $small.RelPermalink }}</code></p>
+    <img src="{{ $small.RelPermalink }}" alt="Resized test image" width="{{ $small.Width }}">
+  {{- else }}
+    <p data-status="nil">resources.Get returned nothing</p>
+  {{- end }}
+</div>

@@ -4,6 +4,9 @@ title: Editor test site
 faq_question: "Is this summary text editable?"
 faq_answer: The answer text.
 my_colors: red
+button_text: Button label
+resize_test:
+  caption: Edit this caption to re-render the component
 buttons:
   - label: First button
     url: /posts/
