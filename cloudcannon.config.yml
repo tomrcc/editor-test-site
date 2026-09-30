@@ -194,6 +194,39 @@ collections_config:
                 static: ""
                 uploads_use_relative_path: true
 
+  posts_f: # H6 variant F: exactly D (create + inputs on the COLLECTION), but with E's wide glob. Isolates glob vs schema-level
+    path: content/posts-f
+    glob:
+      - "**/*.md"
+      - "!_index.md"
+    url: /posts-f/[full_slug]/
+    name: Posts F (collection-level, wide glob)
+    icon: article
+    create:
+      path: "[relative_base_path]/{title|slugify}/index.[ext]"
+    schemas:
+      default:
+        path: .cloudcannon/schemas/post-d.md
+        name: Post
+    _inputs:
+      date:
+        type: datetime
+        instance_value: NOW
+      published_at:
+        type: datetime
+        instance_value: NOW
+      uid:
+        type: text
+        instance_value: UUID
+      image:
+        type: image
+        label: Cover image (collection-level input)
+        options:
+          paths:
+            uploads: content/posts-f/[relative_base_path]
+            static: ""
+            uploads_use_relative_path: true
+
   settings: # T-DEVFILES and T-PARAMS: with include_developer_files
     path: config/_default
     glob:
@@ -259,6 +292,7 @@ collection_groups:
       - posts_c
       - posts_d
       - posts_e
+      - posts_f
   - heading: Site
     collections:
       - settings
