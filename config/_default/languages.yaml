@@ -1,0 +1,5 @@
+en:
+  label: English
+  weight: 1
+  params:
+    p3_tagline: Languages-file tagline type in here

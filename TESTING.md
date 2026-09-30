@@ -15,8 +15,10 @@ Run the local tests first, then the hosted ones. **H6 comes last**, because it m
 
    ```sh
    ../regression-tests/.bin/hugo mod vendor
-   node ../agent-skills/skills/cloudcannon-dev-server/scripts/watch-build.mjs --root . --build-cmd "../regression-tests/.bin/hugo -b /"
+   ../regression-tests/.bin/hugo -b /
    ```
+
+   **MUST NOT** run a rebuild watcher during editor tests. The local editor writes each edit to disk. A watcher then rebuilds and the preview reloads, which hides whether the editor re-rendered anything in the browser. Rebuild by hand only after changing templates or config. After an editor test, check that `public/` still has the old value.
 
    And in a second terminal:
 
@@ -28,7 +30,7 @@ Run the local tests first, then the hosted ones. **H6 comes last**, because it m
 
 | ID | Question | Notes entry |
 | --- | --- | --- |
-| L1 T-PARAMS | Edit Intro title in Site settings. Which of boxes A, B and C update live? | C4, 3.11 |
+| L1 T-PARAMS | Three config files, three boxes each (A primitive, B component reading its context, C component reading `site.*`). P1: edit Intro title in **Site settings**. P2: edit the first menu item's name in **Menus (collection only)**. P3: `languages.yaml` is in no collection, so edit **A3** on the page. For each P, which of A, B and C update live? | C4, 3.11 |
 | L2 T-SINGLEKEY | In Site settings → Links, do the existing items show as "GitHub" and "Email"? Can you add one of each? | 6.4 |
 | L3 T-ARRAY-WRAPPER, T-ICON | Add a button on the home page. Does it render with no `<template>`? Does its icon show? Inspect the icon: is `data-src` `readFile` or `missing`? | 3.12, 3.14 |
 | L4 T-SUMMARY | Can you edit the summary text? Does clicking it toggle the `<details>` instead? | GAP #13 |
@@ -52,8 +54,9 @@ After L11 and L12, run `git checkout -- content` to reset.
 | H1 T-GO | Does the build log print a `go version` line, and does `hugo mod vendor` succeed? | C2, 8.9 |
 | H2 T-NVMRC | Which Node version does the build log show? Any error about `lts/*`? | Open question 17 |
 | H3 T-BASEURL | In the hosted Visual Editor, what does the T-BASEURL box show for `site.BaseURL`? Is its image broken? Is the cover on Bundle post broken? | C1, open question 19 |
-| H4 T-DEVFILES | Does "Site settings" list `params.yaml`? Is "Site settings (no include_developer_files)" empty? | 5.2 |
+| H4 T-DEVFILES | Do "Site settings" and "Menus (collection only)" list their files? Is "Site settings (no include_developer_files)", which covers `markup.yaml`, empty? Locally all three should list their file | 5.2 |
 | H5 T-INDEX | Repeat L14 on the hosted site | C6 |
+| H7 T-TIMING | Repeat L10 on the hosted Visual Editor, with the console set to the preview iframe. Is `inEditorMode` `true` in the inline head line? | 10.1 #11 |
 | H6 T-CREATE, T-UPLOAD, T-DATES | Add → Post. Before saving, upload a cover image. Save. Record: the file path created, where the image landed, and the exact `date` line (quoted or bare). Do components on the home page still render afterwards? | 6.1, 7.1–7.3, 7.7 |
 
 ## What each part of the site is for
@@ -69,4 +72,4 @@ After L11 and L12, run `git checkout -- content` to reset.
 | `config/_default/params.yaml` | Editable settings (YAML, in two collections for T-DEVFILES) |
 | `package.json`, `.nvmrc` | T-NVMRC only |
 
-All dates in content are quoted, because editable-regions v0.0.21 breaks on bare YAML dates (fixed on the unmerged `datetime-fix` branch).
+Until the upstream Visual Editor API fix ships, saving a dated post strips the quotes from its date, and every component on the site fails. After saving a post, re-quote its `date` before the next test (`sed -i '' 's/^date: \(.*Z\)$/date: "\1"/' content/posts/*/index.md`).

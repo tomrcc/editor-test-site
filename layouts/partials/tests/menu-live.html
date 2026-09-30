@@ -1,0 +1,2 @@
+{{- /* Context: a list of maps with a `name` key (menus.yaml's main array in the editor; built the same way at build time). */ -}}
+<p class="box">{{ range $i, $e := . }}{{ if $i }} · {{ end }}{{ .name }}{{ end }}</p>

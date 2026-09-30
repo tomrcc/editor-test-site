@@ -12,11 +12,6 @@ taxonomies:
 outputs:
   home: [HTML, RSS, JSON]
 
-markup:
-  goldmark:
-    renderer:
-      unsafe: true
-
 module:
   imports:
     - path: github.com/adityatelange/hugo-PaperMod

@@ -1,3 +1,6 @@
 ---
 title:
+menu:
+  main:
+    weight:
 ---

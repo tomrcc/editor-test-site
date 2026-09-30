@@ -5,16 +5,41 @@
   <p>Each dashed box is one test. See <code>TESTING.md</code>.</p>
 
   <section class="test" id="t-params">
-    <h2>T-PARAMS: do settings edits reach the page live?</h2>
-    <p><strong>A. Primitive region</strong> (<code>@data[params].tests.intro_title</code>):
-      <span data-editable="text" data-prop="@data[params].tests.intro_title">{{ site.Params.tests.intro_title }}</span></p>
-    <p><strong>B. Component; the partial reads its context (<code>.</code>)</strong></p>
+    <h2>T-PARAMS: do config edits reach the page live?</h2>
+    <p>A = primitive region · B = component, partial reads its context · C = component, partial reads <code>site.*</code></p>
+
+    <h3>P1: params.yaml (collection + data_config)</h3>
+    <p><strong>A1</strong> <span data-editable="text" data-prop="@data[params].tests.intro_title">{{ site.Params.tests.intro_title }}</span></p>
+    <p><strong>B1</strong></p>
     <div data-editable="component" data-component="tests/params-live" data-prop="@data[params].tests">
       {{- partial "tests/params-live" site.Params.tests -}}
     </div>
-    <p><strong>C. Component; the partial reads <code>site.Params</code></strong></p>
+    <p><strong>C1</strong></p>
     <div data-editable="component" data-component="tests/params-stale" data-prop="@data[params].tests">
       {{- partial "tests/params-stale" site.Params.tests -}}
+    </div>
+
+    <h3>P2: menus.yaml (collection only, bound with @file)</h3>
+    {{- $menu := slice }}{{ range site.Menus.main }}{{ $menu = $menu | append (dict "name" .Name) }}{{ end }}
+    <p><strong>A2</strong> <span data-editable="text" data-prop="@file[/config/_default/menus.yaml].main.0.name">{{ (index site.Menus.main 0).Name }}</span></p>
+    <p><strong>B2</strong></p>
+    <div data-editable="component" data-component="tests/menu-live" data-prop="@file[/config/_default/menus.yaml].main">
+      {{- partial "tests/menu-live" $menu -}}
+    </div>
+    <p><strong>C2</strong></p>
+    <div data-editable="component" data-component="tests/menu-stale" data-prop="@file[/config/_default/menus.yaml].main">
+      {{- partial "tests/menu-stale" $menu -}}
+    </div>
+
+    <h3>P3: languages.yaml (data_config only; edit it through A3)</h3>
+    <p><strong>A3</strong> <span data-editable="text" data-prop="@data[langconfig].en.params.p3_tagline">{{ site.Params.p3_tagline }}</span></p>
+    <p><strong>B3</strong></p>
+    <div data-editable="component" data-component="tests/tagline-live" data-prop="@data[langconfig].en.params">
+      {{- partial "tests/tagline-live" (dict "p3_tagline" site.Params.p3_tagline) -}}
+    </div>
+    <p><strong>C3</strong></p>
+    <div data-editable="component" data-component="tests/tagline-stale" data-prop="@data[langconfig].en.params">
+      {{- partial "tests/tagline-stale" (dict "p3_tagline" site.Params.p3_tagline) -}}
     </div>
   </section>
 
@@ -41,6 +66,11 @@
   <section class="test" id="t-summary">
     <h2>T-SUMMARY: text region inside &lt;summary&gt;</h2>
     <details>
+      <summary data-editable="text" data-prop="faq_question">{{ .Params.faq_question }}</summary>
+      <p data-editable="text" data-prop="faq_answer">{{ .Params.faq_answer }}</p>
+    </details>
+    <h3>T-SUMMARY-FIX: same, forced open in the editor</h3>
+    <details data-editor-open>
       <summary data-editable="text" data-prop="faq_question">{{ .Params.faq_question }}</summary>
       <p data-editable="text" data-prop="faq_answer">{{ .Params.faq_answer }}</p>
     </details>

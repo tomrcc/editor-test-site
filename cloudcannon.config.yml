@@ -5,6 +5,8 @@ timezone: Etc/UTC
 data_config:
   params: # T-PARAMS: lets @data[params] regions bind the config file
     path: config/_default/params.yaml
+  langconfig: # T-PARAMS P3: a config file in data_config only, in no collection
+    path: config/_default/languages.yaml
   tags: # T-TAXONOMY
     path: data/tags.yaml
   colors: # T-SELECT-CONVENTION
@@ -87,10 +89,25 @@ collections_config:
     disable_add_folder: true
     disable_file_actions: true
 
-  settings_no_devfiles: # T-DEVFILES: same, without include_developer_files. Expected empty when hosted
+  settings_menus: # T-PARAMS P2: a config file in a collection only, not in data_config
     path: config/_default
     glob:
-      - params.yaml
+      - menus.yaml
+    name: Menus (collection only)
+    icon: menu
+    include_developer_files: true
+    _enabled_editors:
+      - data
+    disable_url: true
+    disable_add: true
+    disable_add_folder: true
+    disable_file_actions: true
+
+  settings_no_devfiles: # T-DEVFILES: a different config file, without include_developer_files. Expected empty when hosted
+    # A file belongs to one collection only, so no two collection globs may match the same file.
+    path: config/_default
+    glob:
+      - markup.yaml
     name: Site settings (no include_developer_files)
     icon: settings_alert
     _enabled_editors:
@@ -122,6 +139,7 @@ collection_groups:
   - heading: Site
     collections:
       - settings
+      - settings_menus
       - settings_no_devfiles
       - site_data
 
@@ -145,6 +163,14 @@ file_config:
         label: Links (single-key maps)
         options:
           structures: _structures.single_key_links
+  - glob: config/_default/menus.yaml
+    _inputs:
+      main:
+        type: array
+        label: Main menu
+      pageRef:
+        type: text
+        label: Page
   - glob: data/tags.yaml # T-TAXONOMY: root array of strings
     _inputs:
       $:
@@ -202,6 +228,10 @@ _structures:
     values:
       - label: GitHub
         icon: code
+        preview:
+          text:
+            - key: github
+            - GitHub
         value:
           github:
         _inputs:
@@ -209,6 +239,10 @@ _structures:
             type: url
       - label: Email
         icon: mail
+        preview:
+          text:
+            - key: email
+            - Email
         value:
           email:
         _inputs:
@@ -218,6 +252,10 @@ _structures:
     values:
       - label: Button
         icon: ads_click
+        preview:
+          text:
+            - key: label
+            - Button
         value:
           label:
           url:
@@ -227,6 +265,10 @@ _structures:
     values:
       - label: Text block
         icon: notes
+        preview:
+          text:
+            - key: text
+            - Text block
         value:
           _name: blocks/text
           text:
@@ -235,6 +277,10 @@ _structures:
             type: markdown
       - label: Stats block
         icon: bar_chart
+        preview:
+          text:
+            - key: heading
+            - Stats block
         value:
           _name: blocks/stats
           heading:
@@ -243,6 +289,10 @@ _structures:
     values:
       - label: Stat
         icon: numbers
+        preview:
+          text:
+            - key: label
+            - Stat
         value:
           value:
           label:

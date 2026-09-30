@@ -1,0 +1,2 @@
+{{- /* Ignores its context on purpose: reads site.Menus instead. */ -}}
+<p class="box">{{ range $i, $e := site.Menus.main }}{{ if $i }} · {{ end }}{{ .Name }}{{ end }}</p>
