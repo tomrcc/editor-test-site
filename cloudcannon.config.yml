@@ -79,6 +79,7 @@ collections_config:
     path: content/image-regions
     glob:
       - "**/index.md"
+      - "_index.md" # the list page holds the L-variants
     url: /image-regions/[full_slug]/
     name: Image regions
     icon: image
@@ -363,6 +364,7 @@ collection_groups:
       - posts_e
       - posts_f
       - posts_g
+      - image_regions
   - heading: Site
     collections:
       - settings

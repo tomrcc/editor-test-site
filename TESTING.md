@@ -61,6 +61,7 @@ After L11 and L12, run `git checkout -- content` to reset.
 | H4 T-DEVFILES | Do "Site settings" and "Menus (collection only)" list their files? Is "Site settings (no include_developer_files)", which covers `markup.yaml`, empty? Locally all three should list their file | 5.2 |
 | H5 T-INDEX | Repeat L14 on the hosted site | C6 |
 | H7 T-TIMING | Repeat L10 on the hosted Visual Editor, with the console set to the preview iframe. Is `inEditorMode` `true` in the inline head line? | 10.1 #11 |
+| H8 T-IMAGE-STATIC | Open **Image regions → Image regions** and **Image regions → Image regions list**. Fill in the hosted tables under [T-IMAGE-STATIC results](#t-image-static-results) | — |
 | H6 T-CREATE, T-UPLOAD, T-DATES | Add → Post. Before saving, upload a cover image. Save. Record: the file path created, where the image landed, and the exact `date` line (quoted or bare). Do components on the home page still render afterwards? | 6.1, 7.1–7.3, 7.7 |
 
 ## What each part of the site is for
@@ -115,7 +116,7 @@ Side effect: the root `_editables.text` also changes the toolbar of the harness'
 
 Question: can an input's `paths.static` let an image region work on an image stored relative to `assets/` or a page bundle?
 
-On load, an image region always replaces `src` with `getPreviewUrl(<stored value>, <input config>)`. So the image survives only if CloudCannon can resolve the stored value with that input's `paths`. Each pair differs only in `paths.static` (`cloudcannon.config.yml`, collection `image_regions`):
+On load, an image region always replaces `src` with `getPreviewUrl(<stored value>, <input config>)`. Each pair differs only in `paths.static` (`cloudcannon.config.yml`, collection `image_regions`):
 
 | Variant | Image lives in | Stored value | Input `paths.static` |
 | --- | --- | --- | --- |
@@ -125,23 +126,49 @@ On load, an image region always replaces `src` with `getPreviewUrl(<stored value
 | B0 | the bundle `content/image-regions/test/` | `cover.jpg` | `""` (control) |
 | B1 | the bundle `content/image-regions/test/` | `cover.jpg` | `content/image-regions/[full_slug]/` |
 
+The list page (`content/image-regions/_index.md`, at `/image-regions/`) shows S0, B0 and B1 again as L-S0, L-B0 and L-B1. They are bound with `@file[/content/image-regions/test/index.md].<key>`, so the images appear on a page other than the one they belong to.
+
+### Local results (L16, 2026-10-08)
+
+| Variant | First load | `src` after load |
+| --- | --- | --- |
+| S0 | Shows | — |
+| A0 | Broken | `test-images/sample.jpg` |
+| A1 | Broken | `test-images/sample.jpg` |
+| B0 | Shows | `cover.jpg` |
+| B1 | Shows | — |
+
+Locally the preview URL is the raw stored value, and `static` changes nothing. The browser resolves the relative `src` against the page URL `/image-regions/test/`. The bundle images show only because Hugo publishes them in that same folder. The `assets/` value resolves to `/image-regions/test/test-images/sample.jpg`, which doesn't exist.
+
+### Hosted (H8)
+
 Steps:
 
-1. Rebuild by hand (`../regression-tests/.bin/hugo -b /`) and restart `cloudcannon dev public`. No watcher.
-2. Open the page and don't touch anything. For each box: does the image show or is it broken? Inspect the `<img>` and copy its `src`.
-3. Only for A1 and B1, and only if they showed in step 2: click the image, choose `other.jpg` from the same folder, and close the panel. Does the new image show? What value did the sidebar input get? Afterwards, set `a1` back to `test-images/sample.jpg` and `b1` back to `cover.jpg` in `content/image-regions/test/index.md`. The folder is untracked, so `git checkout` won't reset it.
+1. Push, and let the site build.
+2. Open each page and don't touch anything. For each box: does the image show or is it broken? Inspect the `<img>` and copy its `src`.
+3. Only for variants that showed in step 2, except S0 and L-S0: click the image, choose `other.jpg` from the same folder, and close the panel. Does the new image show? What value did the sidebar input get? Don't save. Discard the change afterwards.
 
-| Variant | Step 2: shows? | Step 2: `src` in the editor | Step 3: new image shows? | Step 3: stored value |
+Image regions (`/image-regions/test/`):
+
+| Variant | Step 2: shows? | Step 2: `src` | Step 3: new image shows? | Step 3: stored value |
 | --- | --- | --- | --- | --- |
 | S0 | | | — | — |
 | A0 | | | — | — |
 | A1 | | | | |
-| B0 | | | — | — |
+| B0 | | | | |
 | B1 | | | | |
+
+Image regions list (`/image-regions/`):
+
+| Variant | Step 2: shows? | Step 2: `src` | Step 3: new image shows? | Step 3: stored value |
+| --- | --- | --- | --- | --- |
+| L-S0 | | | — | — |
+| L-B0 | | | | |
+| L-B1 | | | | |
 
 What the results mean:
 
-- If S0 is broken, something else on the page is wrong. Stop and fix the page before reading the other rows.
-- If A0 or B0 shows, the bug doesn't reproduce here, so the A1 and B1 rows prove nothing.
-- If A1 and/or B1 work, the skill rule changes from "no image region" to "set the input's `static` so the stored value resolves".
-- If B1 fails with a `src` containing `[full_slug]`, then `static` doesn't expand placeholders.
+- If S0 or L-S0 is broken, something else on the page is wrong. Stop and fix the page before reading the other rows.
+- If A1 shows and A0 doesn't, the hosted editor applies `static`, so `static: assets` makes `assets/` images region-editable.
+- If L-B0 is broken, a bundle image region works only on the bundle's own page. If L-B1 shows as well, `static` with `[full_slug]` fixes the other pages.
+- If any `src` still contains `[full_slug]`, `static` doesn't expand placeholders.

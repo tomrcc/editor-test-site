@@ -1,0 +1,23 @@
+{{- /* T-IMAGE-STATIC: the test page's images on a different page (this list page), bound with @file */ -}}
+{{ define "main" }}
+<article class="post-single">
+  <h1>{{ .Title }}</h1>
+  {{- with site.GetPage "/image-regions/test" }}
+  {{- $page := . }}
+  {{- $file := printf "/content/%s" .File.Path }}
+  {{- range $v := slice
+    (dict "key" "s0" "label" "L-S0" "desc" "static/ image via @file. Positive control: should work")
+    (dict "key" "b0" "label" "L-B0" "desc" "Bundle image via @file, static: \"\"")
+    (dict "key" "b1" "label" "L-B1" "desc" "Bundle image via @file, static: content/image-regions/[full_slug]/") }}
+  {{- $value := index $page.Params $v.key }}
+  {{- $src := $value }}
+  {{- if hasPrefix $v.key "b" }}{{ with $page.Resources.Get $value }}{{ $src = .RelPermalink }}{{ end }}{{ end }}
+  <section class="test" style="border: 2px dashed; padding: 1rem; margin-block: 1rem">
+    <h2>{{ $v.label }}: {{ $v.desc }}</h2>
+    <img data-editable="image" data-prop-src="@file[{{ $file }}].{{ $v.key }}" src="{{ $src }}" alt="{{ $v.label }}" width="240">
+    <p>Stored value <code>{{ $value }}</code> · build <code>src</code> <code>{{ $src }}</code> · bound to <code>@file[{{ $file }}].{{ $v.key }}</code></p>
+  </section>
+  {{- end }}
+  {{- end }}
+</article>
+{{ end }}
