@@ -120,7 +120,7 @@ collections_config:
           paths:
             uploads: content/image-regions/[full_slug]/
             static: content/image-regions/[full_slug]/
-            uploads_use_relative_path: true
+            uploads_use_relative_path: false
 
   posts_b: # H6 variant B: like posts, but NO add_options. Isolates add_options vs create.path
     path: content/posts-b
