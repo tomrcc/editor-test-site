@@ -75,6 +75,52 @@ collections_config:
             static: ""
             uploads_use_relative_path: true
 
+  image_regions: # T-IMAGE-STATIC: one image input per variant; each pair differs only in paths.static
+    path: content/image-regions
+    glob:
+      - "**/index.md"
+    url: /image-regions/[full_slug]/
+    name: Image regions
+    icon: image
+    disable_add: true
+    _inputs:
+      s0:
+        type: image
+        label: S0 static/ (positive control)
+        options:
+          paths:
+            uploads: static/image-regions
+            static: static
+      a0:
+        type: image
+        label: A0 assets/, no static (control)
+        options:
+          paths:
+            uploads: assets/test-images
+      a1:
+        type: image
+        label: "A1 assets/, static: assets"
+        options:
+          paths:
+            uploads: assets/test-images
+            static: assets
+      b0:
+        type: image
+        label: 'B0 bundle, static: "" (control)'
+        options:
+          paths:
+            uploads: content/image-regions/[full_slug]/
+            static: ""
+            uploads_use_relative_path: true
+      b1:
+        type: image
+        label: "B1 bundle, static: content/image-regions/[full_slug]/"
+        options:
+          paths:
+            uploads: content/image-regions/[full_slug]/
+            static: content/image-regions/[full_slug]/
+            uploads_use_relative_path: true
+
   posts_b: # H6 variant B: like posts, but NO add_options. Isolates add_options vs create.path
     path: content/posts-b
     glob:
@@ -369,7 +415,40 @@ file_config:
         type: text
         label: Colour
 
+_editables: # T-EDITABLES-FALLBACK: distinctive fallback toolbars, so you can tell where a toolbar came from
+  text: # ONLY bold + superscript
+    bold: true
+    superscript: true
+  block: # ONLY bold + blockquote + format p/h5
+    bold: true
+    blockquote: true
+    format: p h5
+
 _inputs:
+  # T-EDITABLES-FALLBACK: V1 (fb1_*) has no _inputs entry on purpose
+  fb2_text: # V2: type only
+    type: markdown
+  fb2_block:
+    type: markdown
+  fb3_text: # V3: type + label + comment, still no options
+    type: markdown
+    label: V3 text (label + comment, no options)
+    comment: This comment and label should not block the _editables fallback.
+  fb3_block:
+    type: markdown
+    label: V3 block (label + comment, no options)
+    comment: This comment and label should not block the _editables fallback.
+  fb4_text: # V4: own options, ONLY italic + subscript
+    type: markdown
+    options:
+      italic: true
+      subscript: true
+  fb4_block: # V4: own options, ONLY italic + numbered list + format p/h6
+    type: markdown
+    options:
+      italic: true
+      numberedlist: true
+      format: p h6
   tags: # T-TAXONOMY
     type: multiselect
     comment: Manage the list under Site data → Tags.

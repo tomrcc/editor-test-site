@@ -2,6 +2,8 @@
 
 A throwaway Hugo site for answering the open questions in `../MASTER-NOTES.md`. It uses a real theme as a Hugo module (PaperMod, vendored in the build command) and editable-regions v0.0.21. The home page is a test harness: each dashed box is one test.
 
+**Status:** all tests below were run on 2026-09-30. Results are recorded in `../MASTER-NOTES.md` ("Status after testing" and the entries each row names). This file stays as the recipe for re-checking.
+
 Run the local tests first, then the hosted ones. **H6 comes last**, because it may break every component (see T-DATES).
 
 ## Setup
@@ -44,6 +46,8 @@ Run the local tests first, then the hosted ones. **H6 comes last**, because it m
 | L12 T-DEFAULTS | Edit Old post's title and save. Run `git diff`: which schema keys were added, and with what values (`draft: true`?) | 7.5 |
 | L13 T-NOLIVESYNC | Restart with `cloudcannon dev public --no-live-sync`. Edit `content/about.md` on disk. Does the open editor reload? | Open question 15 |
 | L14 T-INDEX | From the Pages and Posts collections, do Editor test site (`content/_index.md`) and Posts (`content/posts/_index.md`) open at `/` and `/posts/`? | C6, 2.9 |
+| L15 T-EDITABLES-FALLBACK | For each variant V1–V4 in the home page box, click the text region and the block region, then open the same field in the sidebar. Which toolbar does each show? Fill in the table under [T-EDITABLES-FALLBACK results](#t-editables-fallback-results) | — |
+| L16 T-IMAGE-STATIC | Open **Image regions → Image regions** in the Visual Editor. Fill in the table under [T-IMAGE-STATIC results](#t-image-static-results) | — |
 
 After L11 and L12, run `git checkout -- content` to reset.
 
@@ -73,3 +77,71 @@ After L11 and L12, run `git checkout -- content` to reset.
 | `package.json`, `.nvmrc` | T-NVMRC only |
 
 Until the upstream Visual Editor API fix ships, saving a dated post strips the quotes from its date, and every component on the site fails. After saving a post, re-quote its `date` before the next test (`sed -i '' 's/^date: \(.*Z\)$/date: "\1"/' content/posts/*/index.md`).
+
+## Added during testing
+
+| ID | What | Result (see `../MASTER-NOTES.md`) |
+| --- | --- | --- |
+| H6 variants B–G | Collections `posts_b` to `posts_g` isolate why new posts were created flat: `add_options`, schema `date` key, `disable_add_folder`, settings on the schema vs the collection, and the glob | The bundles-only glob was the cause (7.1) |
+| T-BUTTON | Text region inside a `<button>` | Editable, but each click into it fires the button's handler (10.1 #12) |
+| T-RESIZE | `.Resize` on an `additional_dirs` JPEG in a re-rendered component | Fails with `image: unknown format` (3.14) |
+| T-NOLIVESYNC-2 | Rebuild under `--no-live-sync` | The preview doesn't reload (11.3) |
+| T-SUMMARY-FIX | `<details data-editor-open>` opened by `static/js/probe.js` in editor mode | Summary and contents both editable (10.1 #12) |
+
+## T-EDITABLES-FALLBACK results
+
+Question: root `_editables.text` / `.block` apply to a region when its input has no `options`. Do they also reach the sidebar input for the same field?
+
+The toolbars are distinctive, so you can tell where each one comes from:
+
+| Source | Text toolbar | Block toolbar |
+| --- | --- | --- |
+| Root `_editables` fallback | bold + superscript only | bold + blockquote + format (p, h5) only |
+| V4's own input `options` | italic + subscript only | italic + numbered list + format (p, h6) only |
+| Anything else | CloudCannon's defaults | CloudCannon's defaults |
+
+| Variant | `_inputs` | On-page text region | On-page block region | Sidebar `fbN_text` | Sidebar `fbN_block` |
+| --- | --- | --- | --- | --- | --- |
+| V1 | none | | | | |
+| V2 | `type: markdown` | | | | |
+| V3 | `type: markdown` + `label` + `comment` | | | | |
+| V4 | `type: markdown` + own `options` | | | | |
+
+Expected if the claim holds: V2 and V3 show the fallback on the page and CloudCannon's defaults in the sidebar, and V4 shows its own options in both places, with no bold (no merge). V1's sidebar input is inferred, so it may be a plain text input with no toolbar.
+
+Side effect: the root `_editables.text` also changes the toolbar of the harness's other text regions whose inputs have no `options` (the page title, `button_text`). That's expected, and it doesn't affect the other tests.
+
+## T-IMAGE-STATIC results
+
+Question: can an input's `paths.static` let an image region work on an image stored relative to `assets/` or a page bundle?
+
+On load, an image region always replaces `src` with `getPreviewUrl(<stored value>, <input config>)`. So the image survives only if CloudCannon can resolve the stored value with that input's `paths`. Each pair differs only in `paths.static` (`cloudcannon.config.yml`, collection `image_regions`):
+
+| Variant | Image lives in | Stored value | Input `paths.static` |
+| --- | --- | --- | --- |
+| S0 | `static/image-regions/` | `/image-regions/static.jpg` | `static` (positive control) |
+| A0 | `assets/test-images/` | `test-images/sample.jpg` | not set (control) |
+| A1 | `assets/test-images/` | `test-images/sample.jpg` | `assets` |
+| B0 | the bundle `content/image-regions/test/` | `cover.jpg` | `""` (control) |
+| B1 | the bundle `content/image-regions/test/` | `cover.jpg` | `content/image-regions/[full_slug]/` |
+
+Steps:
+
+1. Rebuild by hand (`../regression-tests/.bin/hugo -b /`) and restart `cloudcannon dev public`. No watcher.
+2. Open the page and don't touch anything. For each box: does the image show or is it broken? Inspect the `<img>` and copy its `src`.
+3. Only for A1 and B1, and only if they showed in step 2: click the image, choose `other.jpg` from the same folder, and close the panel. Does the new image show? What value did the sidebar input get? Afterwards, set `a1` back to `test-images/sample.jpg` and `b1` back to `cover.jpg` in `content/image-regions/test/index.md`. The folder is untracked, so `git checkout` won't reset it.
+
+| Variant | Step 2: shows? | Step 2: `src` in the editor | Step 3: new image shows? | Step 3: stored value |
+| --- | --- | --- | --- | --- |
+| S0 | | | — | — |
+| A0 | | | — | — |
+| A1 | | | | |
+| B0 | | | — | — |
+| B1 | | | | |
+
+What the results mean:
+
+- If S0 is broken, something else on the page is wrong. Stop and fix the page before reading the other rows.
+- If A0 or B0 shows, the bug doesn't reproduce here, so the A1 and B1 rows prove nothing.
+- If A1 and/or B1 work, the skill rule changes from "no image region" to "set the input's `static` so the stored value resolves".
+- If B1 fails with a `src` containing `[full_slug]`, then `static` doesn't expand placeholders.

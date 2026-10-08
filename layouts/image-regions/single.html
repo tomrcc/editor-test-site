@@ -1,0 +1,25 @@
+{{- /* T-IMAGE-STATIC: can an input's paths.static make an image region work on assets/ and page-bundle images? */ -}}
+{{ define "main" }}
+<article class="post-single">
+  <h1>{{ .Title }}</h1>
+  {{- $page := . }}
+  {{- range $v := slice
+    (dict "key" "s0" "desc" "static/, root-relative value. Positive control: should work")
+    (dict "key" "a0" "desc" "assets/, no static on the input. Control: expected broken")
+    (dict "key" "a1" "desc" "assets/, static: assets")
+    (dict "key" "b0" "desc" "Bundle, static: \"\". Control: expected broken")
+    (dict "key" "b1" "desc" "Bundle, static: content/image-regions/[full_slug]/") }}
+  {{- $value := index $page.Params $v.key }}
+  {{- $src := "" }}
+  {{- if hasPrefix $v.key "s" }}{{ $src = $value }}
+  {{- else if hasPrefix $v.key "a" }}{{ with resources.Get $value }}{{ $src = .RelPermalink }}{{ end }}
+  {{- else }}{{ with $page.Resources.Get $value }}{{ $src = .RelPermalink }}{{ end }}
+  {{- end }}
+  <section class="test" style="border: 2px dashed; padding: 1rem; margin-block: 1rem">
+    <h2>{{ upper $v.key }}: {{ $v.desc }}</h2>
+    <img data-editable="image" data-prop-src="{{ $v.key }}" src="{{ $src }}" alt="{{ $v.key }}" width="240">
+    <p>Stored value <code>{{ $value }}</code> · build <code>src</code> <code>{{ $src }}</code></p>
+  </section>
+  {{- end }}
+</article>
+{{ end }}

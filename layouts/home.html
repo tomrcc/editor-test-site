@@ -76,6 +76,21 @@
     </details>
   </section>
 
+  <section class="test" id="t-editables-fallback">
+    <h2>T-EDITABLES-FALLBACK: does the _editables fallback reach the sidebar?</h2>
+    <p>Fallback toolbars: text = bold + superscript · block = bold + blockquote + format p/h5. V4's own options: text = italic + subscript · block = italic + numbered list + format p/h6.</p>
+    {{- range $v := slice
+      (dict "n" "1" "desc" "no _inputs entry")
+      (dict "n" "2" "desc" "type: markdown only")
+      (dict "n" "3" "desc" "type: markdown + label + comment")
+      (dict "n" "4" "desc" "type: markdown + its own options") }}
+    {{- $t := printf "fb%s_text" $v.n }}{{ $b := printf "fb%s_block" $v.n }}
+    <h3>V{{ $v.n }}: {{ $v.desc }}</h3>
+    <p data-editable="text" data-type="text" data-prop="{{ $t }}">{{ index $.Params $t | markdownify }}</p>
+    <div data-editable="text" data-type="block" data-prop="{{ $b }}">{{ index $.Params $b | markdownify }}</div>
+    {{- end }}
+  </section>
+
   <section class="test" id="t-button">
     <h2>T-BUTTON: text region inside a &lt;button&gt;</h2>
     <button type="button" onclick="this.dataset.clicks = (+this.dataset.clicks || 0) + 1; document.getElementById('t-button-clicks').textContent = this.dataset.clicks">

@@ -26,4 +26,12 @@ content_blocks:
   - _name: blocks/stats
     heading: Stats with no items
     items: []
+fb1_text: V1 inline text
+fb1_block: V1 block text
+fb2_text: V2 inline text
+fb2_block: V2 block text
+fb3_text: V3 inline text
+fb3_block: V3 block text
+fb4_text: V4 inline text
+fb4_block: V4 block text
 ---
